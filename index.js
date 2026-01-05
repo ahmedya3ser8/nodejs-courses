@@ -23,13 +23,12 @@ mongoose.connect(url).then(() => {
 })
 
 app.use(cors());
-app.use(express.json()); // handle body in the app
+app.use(express.json());
 
 app.use('/api/courses', coursesRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 
-// handle 404 pages
 app.use((req, res, next) => {
   return res.status(404).json({
     status: 'error',
@@ -37,7 +36,6 @@ app.use((req, res, next) => {
   })
 })
 
-// handle global error 
 app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {

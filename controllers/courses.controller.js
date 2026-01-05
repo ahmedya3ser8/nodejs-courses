@@ -11,8 +11,33 @@ const getAllCourses = asyncWrapper(async (req, res) => {
   const page = parseInt(query.page) || 1;
   const skip = (page - 1) * limit;
 
-  // const courses = await CourseModel.find({ price: { $gt: 2800 } });
-  const courses = await CourseModel.find({}, { "__v": false }).limit(limit).skip(skip);
+  const filter = {};
+  if (query.search) {
+    console.log(query.search);
+    filter.title = { $regex: query.search, $options: 'i' }
+  }
+
+  Object.keys(query).forEach(key => {
+    const match = key.match(/^(.+)\[(gte|lte|gt|lt|eq)\]$/);
+    if (match) {
+      const field = match[1];
+      const operator = `$${match[2]}`;
+      if (!filter[field]) filter[field] = {};
+      filter[field][operator] = Number(query[key]);
+    }
+  });
+
+  const sort = {};
+  if (query.sort) {
+    if (query.sort.startsWith('-')) {
+      const field = query.sort.slice(1);
+      sort[field] = -1;
+    } else {
+      sort[query.sort] = 1;
+    }
+  }
+  
+  const courses = await CourseModel.find(filter, { "__v": false }).sort(sort).limit(limit).skip(skip);
   const total = await CourseModel.countDocuments();
 
   const totalPages = Math.ceil(total / limit);

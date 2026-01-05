@@ -9,6 +9,7 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     required: true
   }
-})
+  }, { timestamps: true }
+)
 
-export default mongoose.model('Course', courseSchema); // uppercase and course --> by default it transform to Courses
+export default mongoose.model('Course', courseSchema); 
